@@ -20,12 +20,13 @@ def _reset_theme():
 
 class TestThemeDataModel:
     def test_fields_accessible(self):
-        t = Theme(name="ocean", primary="#a0c4ff", secondary="#bdb2ff", accent="#caffbf", surface="#ffd6a5")
-        assert t.name == "ocean"
-        assert t.primary == "#a0c4ff"
-        assert t.secondary == "#bdb2ff"
-        assert t.accent == "#caffbf"
-        assert t.surface == "#ffd6a5"
+        t = Theme(name="golden", primary="#F9DC5C", secondary="#FAE588", accent="#FCEFB4", surface="#FDF8E1", highlight="#F9DC5C")
+        assert t.name == "golden"
+        assert t.primary == "#F9DC5C"
+        assert t.secondary == "#FAE588"
+        assert t.accent == "#FCEFB4"
+        assert t.surface == "#FDF8E1"
+        assert t.highlight == "#F9DC5C"
 
 
 class TestThemeRegistry:
@@ -38,9 +39,9 @@ class TestThemeRegistry:
 
     def test_get_theme_known(self):
         registry = ThemeRegistry()
-        theme = registry.get_theme("ocean")
+        theme = registry.get_theme("golden")
         assert theme is not None
-        assert theme.name == "ocean"
+        assert theme.name == "golden"
 
     def test_get_theme_unknown(self):
         registry = ThemeRegistry()
@@ -53,8 +54,8 @@ class TestActiveTheme:
         assert theme.name == BUILTIN_THEMES[0].name
 
     def test_set_active_theme(self):
-        set_active_theme("sunset")
-        assert get_active_theme().name == "sunset"
+        set_active_theme("coral")
+        assert get_active_theme().name == "coral"
 
     def test_set_unknown_theme_raises(self):
         with pytest.raises(ValueError, match="Unknown theme"):

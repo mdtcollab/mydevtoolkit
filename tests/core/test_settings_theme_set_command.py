@@ -29,20 +29,20 @@ class TestListThemes:
     def test_no_args_lists_themes(self, command, context):
         result = command(args=[], context=context)
         assert result.success is True
-        assert "ocean" in result.output
-        assert "sunset" in result.output
+        assert "golden" in result.output
+        assert "coral" in result.output
 
 
 class TestSetTheme:
     def test_set_valid_theme(self, command, context):
-        result = command(args=["ocean"], context=context)
+        result = command(args=["coral"], context=context)
         assert result.success is True
-        assert result.data["theme"] == "ocean"
-        assert get_active_theme().name == "ocean"
+        assert result.data["theme"] == "coral"
+        assert get_active_theme().name == "coral"
 
     def test_set_unknown_theme(self, command, context):
         result = command(args=["nonexistent"], context=context)
         assert result.success is False
         assert "nonexistent" in result.error
-        assert "ocean" in result.error  # lists valid names
+        assert "golden" in result.error  # lists valid names
 

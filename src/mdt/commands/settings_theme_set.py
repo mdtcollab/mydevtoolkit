@@ -28,7 +28,8 @@ class SettingsThemeSetCommand:
                 f"[{t.primary}]██[/{t.primary}] "
                 f"[{t.secondary}]██[/{t.secondary}] "
                 f"[{t.accent}]██[/{t.accent}] "
-                f"[{t.surface}]██[/{t.surface}]"
+                f"[{t.surface}]██[/{t.surface}] "
+                f"[{t.highlight}]██[/{t.highlight}]"
             )
         lines.append("\nUsage: settings theme set <name>")
         return CommandResult(success=True, output="\n".join(lines))

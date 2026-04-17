@@ -62,6 +62,8 @@ class ShellScreen(Screen[None]):
 
     def _apply_theme(self) -> None:
         """Apply the active theme colors to all shell zones."""
+        from mdt.ui.completion_input import SuggestionDisplay
+
         theme = get_active_theme()
         self.query_one("#header", Label).styles.color = theme.primary
         self.query_one("#help-summary", Label).styles.color = theme.secondary
@@ -69,7 +71,13 @@ class ShellScreen(Screen[None]):
         activity.styles.border = ("solid", theme.accent)
         prompt = self.query_one("#prompt", CompletionInput)
         prompt.styles.border = ("solid", theme.surface)
-        self._current_accent = theme.accent
+        # Style the inner input textbox border
+        inner_input = prompt.query_one("#input", Input)
+        inner_input.styles.border = ("tall", theme.surface)
+        # Style the intellisense/suggestion dropdown border
+        suggestion = prompt.query_one("#suggestions", SuggestionDisplay)
+        suggestion.styles.border = ("tall", theme.accent)
+        self._current_accent = theme.highlight
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         command_text = event.value.strip()
