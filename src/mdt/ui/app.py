@@ -13,7 +13,7 @@ class MdtApp(App[None]):
         super().__init__()
         context = ProjectContext.detect()
         dispatcher = CommandDispatcher(COMMAND_REGISTRY, context)
-        self._shell_screen = ShellScreen(dispatcher=dispatcher)
+        self._shell_screen = ShellScreen(dispatcher=dispatcher, registry=COMMAND_REGISTRY)
 
     def on_mount(self) -> None:
         self.push_screen(self._shell_screen)

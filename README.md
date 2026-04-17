@@ -25,6 +25,17 @@ The shell stays open for repeated commands and now includes:
 - a short help summary with top-level categories
 - an activity/timeline pane for command history and results
 - a persistent command input at the bottom
+- **IntelliSense-style completion**: suggestions appear as you type
+
+## Command Completion
+
+The shell supports Tab completion for commands, sub-commands, and known options:
+
+- **Tab**: Complete or advance the current suggestion
+- **Enter**: Accept an unambiguous completion and execute
+- **Escape**: Dismiss suggestions without changing input
+
+Completions are driven by the command registry—new commands automatically gain completion support. Commands can optionally declare argument completions (e.g., `git branch` suggests category prefixes like `feature`, `bugfix`).
 
 Initial commands and categories:
 
