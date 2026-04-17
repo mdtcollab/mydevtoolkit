@@ -8,6 +8,7 @@ from textual.binding import Binding
 from textual import events
 
 from mdt.core.completion import CompletionEngine
+from mdt.core.history import CommandHistory
 
 
 class SuggestionDisplay(Static):
@@ -16,10 +17,12 @@ class SuggestionDisplay(Static):
     DEFAULT_CSS = """
     SuggestionDisplay {
         height: auto;
-        max-height: 5;
-        padding: 0 1;
-        background: $surface;
-        color: $text-muted;
+        max-height: 8;
+        padding: 0;
+        margin: 0 1;
+        background: $surface-darken-1;
+        color: $text;
+        border: tall $primary-background-darken-1;
         display: none;
     }
     SuggestionDisplay.visible {
@@ -28,13 +31,13 @@ class SuggestionDisplay(Static):
     """
 
     def set_suggestions(self, suggestions: list[str]) -> None:
-        """Update the displayed suggestions."""
+        """Update the displayed suggestions as a vertical list."""
         if suggestions:
-            # Show up to 10 suggestions
             display_list = suggestions[:10]
+            lines = [f"  {s}" for s in display_list]
             if len(suggestions) > 10:
-                display_list.append(f"... and {len(suggestions) - 10} more")
-            self.update("  ".join(display_list))
+                lines.append(f"  [dim]… and {len(suggestions) - 10} more[/dim]")
+            self.update("\n".join(lines))
             self.add_class("visible")
         else:
             self.update("")
@@ -58,12 +61,15 @@ class CompletionInput(Container):
     }
     CompletionInput > Input {
         margin: 0;
+        border: tall $accent;
     }
     """
 
     BINDINGS = [
         Binding("tab", "complete", "Complete", show=False),
         Binding("escape", "dismiss_suggestions", "Dismiss", show=False),
+        Binding("up", "history_previous", "Previous", show=False),
+        Binding("down", "history_next", "Next", show=False),
     ]
 
     def __init__(
@@ -71,12 +77,14 @@ class CompletionInput(Container):
         engine: CompletionEngine,
         placeholder: str = "Enter command",
         id: str | None = None,
+        history: CommandHistory | None = None,
     ) -> None:
         super().__init__(id=id)
         self._engine = engine
         self._placeholder = placeholder
         self._suggestions: list[str] = []
         self._suggestion_index = 0
+        self._history = history or CommandHistory()
 
     def compose(self) -> ComposeResult:
         yield SuggestionDisplay(id="suggestions")
@@ -148,6 +156,22 @@ class CompletionInput(Container):
         self._suggestions = []
         suggestion_display = self.query_one("#suggestions", SuggestionDisplay)
         suggestion_display.set_suggestions([])
+
+    def action_history_previous(self) -> None:
+        """Handle Up arrow: navigate to previous command in history."""
+        cmd = self._history.previous()
+        if cmd is not None:
+            self.input.value = cmd
+            self.input.cursor_position = len(cmd)
+
+    def action_history_next(self) -> None:
+        """Handle Down arrow: navigate to next command in history."""
+        cmd = self._history.next()
+        if cmd is not None:
+            self.input.value = cmd
+            self.input.cursor_position = len(cmd)
+        else:
+            self.input.value = ""
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle Enter key: accept unambiguous completion before bubbling."""

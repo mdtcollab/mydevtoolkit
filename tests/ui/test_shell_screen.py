@@ -75,3 +75,30 @@ async def test_suggestions_display_while_typing() -> None:
 
         suggestions = app.screen.query_one("#suggestions", SuggestionDisplay)
         assert suggestions.has_class("visible")
+
+
+@pytest.mark.asyncio
+async def test_command_history_navigation() -> None:
+    """Test that up/down arrows navigate command history."""
+    app = MdtApp()
+
+    async with app.run_test() as pilot:
+        # Execute two commands
+        await pilot.press("h", "e", "l", "p", "enter")
+        await pilot.pause()
+
+        await pilot.press("e", "x", "i", "t")
+        await pilot.pause()
+        # Don't press enter for exit (it would close the app)
+        # Instead clear and type a different command
+        prompt = app.screen.query_one("#prompt", CompletionInput)
+        prompt.value = ""
+
+        await pilot.press("h", "e", "l", "p", "enter")
+        await pilot.pause()
+
+        # Now press up to get previous command
+        await pilot.press("up")
+        await pilot.pause()
+
+        assert prompt.value == "help"
