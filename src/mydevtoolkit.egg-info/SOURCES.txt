@@ -4,8 +4,11 @@ pyproject.toml
 src/mdt/__init__.py
 src/mdt/__main__.py
 src/mdt/commands/__init__.py
+src/mdt/commands/copilot.py
 src/mdt/commands/exit.py
+src/mdt/commands/git_branch.py
 src/mdt/commands/help.py
+src/mdt/commands/openspec_branch.py
 src/mdt/core/__init__.py
 src/mdt/core/context.py
 src/mdt/core/dispatcher.py

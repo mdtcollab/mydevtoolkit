@@ -68,3 +68,24 @@ def test_dispatch_catches_command_exception() -> None:
     assert result.success is False
     assert "boom" in (result.error or "")
 
+
+def test_dispatch_two_word_command_returns_success() -> None:
+    registry = CommandRegistry()
+    registry.register("git_branch", EchoCommand, category="git")
+    dispatcher = CommandDispatcher(registry, _context())
+
+    result = dispatcher.dispatch("git branch feature abc-123 login page")
+
+    assert result.success is True
+    assert result.output == "feature abc-123 login page"
+
+
+def test_dispatch_unknown_two_word_command_returns_failed_result() -> None:
+    dispatcher = CommandDispatcher(CommandRegistry(), _context())
+
+    result = dispatcher.dispatch("openspec unknown")
+
+    assert result.success is False
+    assert result.error == "Unknown command: openspec unknown"
+
+

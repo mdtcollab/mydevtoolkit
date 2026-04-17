@@ -16,10 +16,15 @@ class CommandDispatcher:
         tokens = stripped.split()
         command_name, args = tokens[0], tokens[1:]
         handler_cls = self._registry.resolve(command_name)
+        if handler_cls is None and len(tokens) >= 2:
+            two_word_key = f"{tokens[0]}_{tokens[1]}"
+            handler_cls = self._registry.resolve(two_word_key)
+            if handler_cls is not None:
+                args = tokens[2:]
         if handler_cls is None:
             return CommandResult(
                 success=False,
-                error=f"Unknown command: {command_name}",
+                error=f"Unknown command: {stripped}",
             )
 
         try:

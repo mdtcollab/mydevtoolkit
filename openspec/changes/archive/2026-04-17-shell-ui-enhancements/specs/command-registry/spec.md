@@ -1,10 +1,7 @@
-# command-registry Specification
+## MODIFIED Requirements
 
-## Purpose
-Define how shell commands and their category metadata are registered and discovered.
-## Requirements
 ### Requirement: Commands can be registered by name
-The `CommandRegistry` SHALL allow associating a string command name with a handler class and an optional category string.
+The `CommandRegistry` SHALL allow associating a string command name with a handler class and an optional `category` string.
 
 #### Scenario: Successful registration without category
 - **WHEN** `registry.register("help", HelpCommand)` is called
@@ -18,19 +15,7 @@ The `CommandRegistry` SHALL allow associating a string command name with a handl
 - **WHEN** `registry.register("help", HelpCommand)` is called a second time
 - **THEN** the registry raises `ValueError`
 
-### Requirement: Unknown command resolves to None
-The `CommandRegistry` SHALL return `None` when asked to resolve an unregistered name.
-
-#### Scenario: Unknown command
-- **WHEN** `registry.resolve("unknown")` is called for a name that was never registered
-- **THEN** the return value is `None`
-
-### Requirement: Registry lists all registered command names
-The `CommandRegistry` SHALL expose the set of all registered command names.
-
-#### Scenario: List names
-- **WHEN** `registry.names()` is called after registering `help` and `exit`
-- **THEN** the returned collection contains exactly `{"help", "exit"}`
+## ADDED Requirements
 
 ### Requirement: Registry exposes all commands with metadata via all()
 The `CommandRegistry` SHALL provide `all()` returning a list of `(name, handler_class, category)` tuples, where `category` is `None` if not set.
