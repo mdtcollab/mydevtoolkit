@@ -16,6 +16,11 @@ class CommandDispatcher:
         tokens = stripped.split()
         command_name, args = tokens[0], tokens[1:]
         handler_cls = self._registry.resolve(command_name)
+        if handler_cls is None and len(tokens) >= 3:
+            three_word_key = f"{tokens[0]}_{tokens[1]}_{tokens[2]}"
+            handler_cls = self._registry.resolve(three_word_key)
+            if handler_cls is not None:
+                args = tokens[3:]
         if handler_cls is None and len(tokens) >= 2:
             two_word_key = f"{tokens[0]}_{tokens[1]}"
             handler_cls = self._registry.resolve(two_word_key)

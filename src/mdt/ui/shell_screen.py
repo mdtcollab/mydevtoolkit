@@ -6,6 +6,7 @@ from mdt.core.completion import CompletionEngine
 from mdt.core.dispatcher import CommandDispatcher
 from mdt.core.history import CommandHistory
 from mdt.core.registry import CommandRegistry
+from mdt.core.themes import get_active_theme
 from mdt.ui.completion_input import CompletionInput
 
 ASCII_HEADER = """\
@@ -16,7 +17,7 @@ ASCII_HEADER = """\
   ██║ ╚═╝ ██║██████╔╝   ██║   
   ╚═╝     ╚═╝╚═════╝    ╚═╝    MyDevToolkit"""
 
-HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]"
+HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]  [cyan]settings[/cyan]"
 
 
 class ShellScreen(Screen[None]):
@@ -27,12 +28,10 @@ class ShellScreen(Screen[None]):
     #header {
         height: auto;
         padding: 1 2;
-        color: cyan;
     }
     #help-summary {
         height: auto;
         padding: 0 2 1 2;
-        color: $text-muted;
     }
     #activity {
         border: solid $panel;
@@ -58,16 +57,37 @@ class ShellScreen(Screen[None]):
         yield CompletionInput(engine=self._engine, placeholder="Enter command", id="prompt", history=self._history)
 
     def on_mount(self) -> None:
+        self._apply_theme()
         self.query_one("#prompt", CompletionInput).focus()
+
+    def _apply_theme(self) -> None:
+        """Apply the active theme colors to all shell zones."""
+        from mdt.ui.completion_input import SuggestionDisplay
+
+        theme = get_active_theme()
+        self.query_one("#header", Label).styles.color = theme.primary
+        self.query_one("#help-summary", Label).styles.color = theme.secondary
+        activity = self.query_one("#activity", RichLog)
+        activity.styles.border = ("solid", theme.accent)
+        prompt = self.query_one("#prompt", CompletionInput)
+        prompt.styles.border = ("solid", theme.surface)
+        # Style the inner input textbox border
+        inner_input = prompt.query_one("#input", Input)
+        inner_input.styles.border = ("tall", theme.surface)
+        # Style the intellisense/suggestion dropdown border
+        suggestion = prompt.query_one("#suggestions", SuggestionDisplay)
+        suggestion.styles.border = ("tall", theme.accent)
+        self._current_accent = theme.highlight
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         command_text = event.value.strip()
         prompt = self.query_one("#prompt", CompletionInput)
         activity = self.query_one("#activity", RichLog)
+        accent = getattr(self, "_current_accent", "cyan")
 
         if command_text:
             self._history.add(command_text)
-            activity.write(f"[bold cyan]>[/bold cyan] {command_text}")
+            activity.write(f"[{accent}]>[/{accent}] {command_text}")
             result = self._dispatcher.dispatch(command_text)
 
             if result.output:
@@ -76,6 +96,9 @@ class ShellScreen(Screen[None]):
 
             if result.error:
                 activity.write(f"[red]{result.error}[/red]")
+
+            if result.data.get("theme"):
+                self._apply_theme()
 
             if result.exit_requested:
                 self.app.exit()

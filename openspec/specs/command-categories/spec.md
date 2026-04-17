@@ -23,11 +23,11 @@ The `CommandRegistry` SHALL provide a method `all()` returning a list of `(name,
 - **THEN** each tuple contains the name, class, and category (or `None`) for that command
 
 ### Requirement: Help command groups output by category
-The `help` command SHALL list commands grouped under their category heading, with uncategorised commands shown under a "Built-in" heading.
+The `help` command SHALL list commands grouped under their category heading, with uncategorised commands shown under a "Built-in" heading. The `settings` category SHALL appear in the category list.
 
 #### Scenario: Grouped help output
 - **WHEN** the user submits `help`
-- **THEN** the result message lists categories as headings and their commands below each heading
+- **THEN** the result message lists categories as headings including `settings` and their commands below each heading
 
 #### Scenario: Empty categories are shown
 - **WHEN** the registry declares a category with no registered commands
