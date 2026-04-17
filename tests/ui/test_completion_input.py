@@ -4,6 +4,7 @@ from __future__ import annotations
 import pytest
 
 from mdt.core.completion import CompletionEngine
+from mdt.core.history import CommandHistory
 from mdt.core.registry import CommandRegistry
 from mdt.ui.completion_input import CompletionInput, SuggestionDisplay
 
@@ -87,3 +88,16 @@ class TestCompletionInputCommonPrefix:
         assert result.lower() == "feature"
 
 
+class TestCompletionInputHistory:
+    """Tests for history navigation in CompletionInput."""
+
+    def test_accepts_history_parameter(self) -> None:
+        engine = make_engine()
+        history = CommandHistory()
+        widget = CompletionInput(engine=engine, history=history)
+        assert widget._history is history
+
+    def test_default_history_created_if_none(self) -> None:
+        engine = make_engine()
+        widget = CompletionInput(engine=engine)
+        assert widget._history is not None

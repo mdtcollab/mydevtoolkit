@@ -4,6 +4,7 @@ from textual.widgets import Input, Label, RichLog
 
 from mdt.core.completion import CompletionEngine
 from mdt.core.dispatcher import CommandDispatcher
+from mdt.core.history import CommandHistory
 from mdt.core.registry import CommandRegistry
 from mdt.ui.completion_input import CompletionInput
 
@@ -40,7 +41,7 @@ class ShellScreen(Screen[None]):
     }
     #prompt {
         dock: bottom;
-        margin: 1;
+        margin: 1 0;
     }
     """
 
@@ -48,12 +49,13 @@ class ShellScreen(Screen[None]):
         super().__init__()
         self._dispatcher = dispatcher
         self._engine = CompletionEngine(registry)
+        self._history = CommandHistory()
 
     def compose(self) -> ComposeResult:
         yield Label(ASCII_HEADER, id="header")
         yield Label(HELP_SUMMARY, id="help-summary", markup=True)
         yield RichLog(id="activity", wrap=True, highlight=True, markup=True)
-        yield CompletionInput(engine=self._engine, placeholder="Enter command", id="prompt")
+        yield CompletionInput(engine=self._engine, placeholder="Enter command", id="prompt", history=self._history)
 
     def on_mount(self) -> None:
         self.query_one("#prompt", CompletionInput).focus()
@@ -64,6 +66,7 @@ class ShellScreen(Screen[None]):
         activity = self.query_one("#activity", RichLog)
 
         if command_text:
+            self._history.add(command_text)
             activity.write(f"[bold cyan]>[/bold cyan] {command_text}")
             result = self._dispatcher.dispatch(command_text)
 
