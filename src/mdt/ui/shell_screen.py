@@ -2,7 +2,10 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Input, Label, RichLog
 
+from mdt.core.completion import CompletionEngine
 from mdt.core.dispatcher import CommandDispatcher
+from mdt.core.registry import CommandRegistry
+from mdt.ui.completion_input import CompletionInput
 
 ASCII_HEADER = """\
   ███╗   ███╗██████╗ ████████╗
@@ -41,22 +44,23 @@ class ShellScreen(Screen[None]):
     }
     """
 
-    def __init__(self, dispatcher: CommandDispatcher) -> None:
+    def __init__(self, dispatcher: CommandDispatcher, registry: CommandRegistry) -> None:
         super().__init__()
         self._dispatcher = dispatcher
+        self._engine = CompletionEngine(registry)
 
     def compose(self) -> ComposeResult:
         yield Label(ASCII_HEADER, id="header")
         yield Label(HELP_SUMMARY, id="help-summary", markup=True)
         yield RichLog(id="activity", wrap=True, highlight=True, markup=True)
-        yield Input(placeholder="Enter command", id="prompt")
+        yield CompletionInput(engine=self._engine, placeholder="Enter command", id="prompt")
 
     def on_mount(self) -> None:
-        self.query_one("#prompt", Input).focus()
+        self.query_one("#prompt", CompletionInput).focus()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         command_text = event.value.strip()
-        prompt = self.query_one("#prompt", Input)
+        prompt = self.query_one("#prompt", CompletionInput)
         activity = self.query_one("#activity", RichLog)
 
         if command_text:

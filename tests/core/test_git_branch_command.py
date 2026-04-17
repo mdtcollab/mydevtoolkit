@@ -86,6 +86,33 @@ class TestGitBranchCommand:
             mock_run.assert_called_once_with(["feature", "abc-123", "test"], "/fake")
 
 
+class TestGitBranchCommandCompletions:
+    """Tests for GitBranchCommand.get_completions method."""
 
+    def test_position_0_returns_all_prefixes_with_empty_input(self):
+        result = GitBranchCommand.get_completions(0, [])
+        assert result == ["bugfix", "chore", "feature", "hotfix", "refactor"]
 
+    def test_position_0_filters_by_prefix(self):
+        result = GitBranchCommand.get_completions(0, ["fe"])
+        assert result == ["feature"]
 
+    def test_position_0_filters_by_prefix_case_insensitive(self):
+        result = GitBranchCommand.get_completions(0, ["FE"])
+        assert result == ["feature"]
+
+    def test_position_0_multiple_matches(self):
+        result = GitBranchCommand.get_completions(0, ["b"])
+        assert result == ["bugfix"]
+
+    def test_position_0_partial_prefix_hotfix(self):
+        result = GitBranchCommand.get_completions(0, ["ho"])
+        assert result == ["hotfix"]
+
+    def test_position_1_returns_empty_list(self):
+        result = GitBranchCommand.get_completions(1, ["abc"])
+        assert result == []
+
+    def test_position_2_returns_empty_list(self):
+        result = GitBranchCommand.get_completions(2, ["test"])
+        assert result == []

@@ -75,4 +75,14 @@ class GitBranchCommand:
         root = str(context.repo_root or context.cwd)
         return run_git_branch(args, root)
 
+    @staticmethod
+    def get_completions(position: int, tokens: list[str]) -> list[str]:
+        """Return completion candidates for the given argument position.
 
+        Position 0: category prefix (feature, bugfix, etc.)
+        Other positions: no predefined completions
+        """
+        if position == 0:
+            prefix = tokens[0].lower() if tokens else ""
+            return sorted(p for p in KNOWN_PREFIXES if p.startswith(prefix))
+        return []
