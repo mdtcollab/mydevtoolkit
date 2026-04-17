@@ -10,12 +10,14 @@ src/mdt/commands/git_branch.py
 src/mdt/commands/help.py
 src/mdt/commands/openspec_branch.py
 src/mdt/core/__init__.py
+src/mdt/core/completion.py
 src/mdt/core/context.py
 src/mdt/core/dispatcher.py
 src/mdt/core/registry.py
 src/mdt/core/result.py
 src/mdt/ui/__init__.py
 src/mdt/ui/app.py
+src/mdt/ui/completion_input.py
 src/mdt/ui/shell_screen.py
 src/mydevtoolkit.egg-info/PKG-INFO
 src/mydevtoolkit.egg-info/SOURCES.txt
