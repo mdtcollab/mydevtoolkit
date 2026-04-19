@@ -24,6 +24,7 @@ src/mdt/commands/git_branch.py
 src/mdt/commands/help.py
 src/mdt/commands/openspec_branch.py
 src/mdt/commands/openspec_finish.py
+src/mdt/commands/settings_editor_set.py
 src/mdt/commands/settings_theme_set.py
 src/mdt/core/__init__.py
 src/mdt/core/completion.py
@@ -32,6 +33,7 @@ src/mdt/core/dispatcher.py
 src/mdt/core/history.py
 src/mdt/core/registry.py
 src/mdt/core/result.py
+src/mdt/core/settings.py
 src/mdt/core/themes.py
 src/mdt/ui/__init__.py
 src/mdt/ui/app.py
