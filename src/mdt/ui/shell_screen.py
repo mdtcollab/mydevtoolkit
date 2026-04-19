@@ -100,8 +100,21 @@ class ShellScreen(Screen[None]):
             if result.data.get("theme"):
                 self._apply_theme()
 
+            if result.data.get("run_external"):
+                self._run_external(result.data["run_external"], activity)
+
             if result.exit_requested:
                 self.app.exit()
 
         prompt.value = ""
         prompt.focus()
+
+    def _run_external(self, cmd: list[str], activity) -> None:
+        """Suspend Textual, run an external command, then resume."""
+        import subprocess
+
+        with self.app.suspend():
+            subprocess.run(cmd, check=False)
+        activity.write("[green]Editor closed.[/green]")
+
+

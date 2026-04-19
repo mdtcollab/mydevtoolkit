@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 
 from mdt.catalog.item import CatalogItem
+from mdt.core import settings
 
 FALLBACK_EDITORS = ["nano", "vi"]
 
@@ -20,7 +21,6 @@ class CatalogEditor:
 
     def resolve_editor(self) -> str:
         """Resolve which editor to use. Checks MDT settings, then $EDITOR, then fallbacks."""
-        from mdt.core import settings
         configured = settings.get("editor")
         if configured:
             return configured

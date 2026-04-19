@@ -24,13 +24,20 @@ class CatalogEditCommand:
         if item is None:
             return CommandResult(success=False, error=f"Catalog item '{name}' not found.")
 
-        editor = CatalogEditor(catalog.root)
+        editor_helper = CatalogEditor(catalog.root)
         try:
-            editor.edit(item)
+            editor_cmd = editor_helper.resolve_editor()
         except RuntimeError as e:
             return CommandResult(success=False, error=str(e))
 
-        return CommandResult(success=True, output=f"Opened '{name}' in editor.")
+        source_path = editor_helper.resolve_source_path(item)
+        cmd = editor_cmd.split() + [str(source_path)]
+
+        return CommandResult(
+            success=True,
+            output=f"Opening '{name}' in {editor_cmd}...",
+            data={"run_external": cmd},
+        )
 
     @staticmethod
     def get_completions(position: int, tokens: list[str]) -> list[str]:
