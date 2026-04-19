@@ -17,7 +17,7 @@ ASCII_HEADER = """\
   ██║ ╚═╝ ██║██████╔╝   ██║   
   ╚═╝     ╚═╝╚═════╝    ╚═╝    MyDevToolkit"""
 
-HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]  [cyan]settings[/cyan]"
+HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]  [cyan]catalog[/cyan]  [cyan]settings[/cyan]"
 
 
 class ShellScreen(Screen[None]):
