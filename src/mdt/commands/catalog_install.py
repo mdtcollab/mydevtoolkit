@@ -50,9 +50,19 @@ class CatalogInstallCommand:
 
     @staticmethod
     def get_completions(position: int, tokens: list[str]) -> list[str]:
+        if position == 0:
+            from mdt.catalog.registry import CatalogRegistry
+            prefix = tokens[0].lower() if tokens else ""
+            catalog = CatalogRegistry()
+            return sorted(
+                item.name for item in catalog.list_items()
+                if item.name.startswith(prefix)
+            )
         if position == 1:
             prefix = tokens[1].lower() if len(tokens) > 1 else ""
+            return [f for f in ["--target"] if f.startswith(prefix)]
+        if position == 2:
+            prefix = tokens[2].lower() if len(tokens) > 2 else ""
             targets = ["claude", "copilot", "opencode"]
             return [t for t in targets if t.startswith(prefix)]
         return []
-

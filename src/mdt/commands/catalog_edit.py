@@ -32,3 +32,14 @@ class CatalogEditCommand:
 
         return CommandResult(success=True, output=f"Opened '{name}' in editor.")
 
+    @staticmethod
+    def get_completions(position: int, tokens: list[str]) -> list[str]:
+        if position == 0:
+            from mdt.catalog.registry import CatalogRegistry
+            prefix = tokens[0].lower() if tokens else ""
+            catalog = CatalogRegistry()
+            return sorted(
+                item.name for item in catalog.list_items()
+                if item.name.startswith(prefix)
+            )
+        return []

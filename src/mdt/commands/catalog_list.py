@@ -49,9 +49,20 @@ class CatalogListCommand:
 
     @staticmethod
     def get_completions(position: int, tokens: list[str]) -> list[str]:
-        if position % 2 == 0:
+        # Determine if we're at a flag or a value position
+        # Flags: --kind, --target, --language, --topic
+        # After a flag, offer its values
+        if position > 0 and position <= len(tokens):
+            prev = tokens[position - 1].lower() if position - 1 < len(tokens) else ""
             prefix = tokens[position].lower() if position < len(tokens) else ""
-            flags = ["--kind", "--target", "--language", "--topic"]
-            return [f for f in flags if f.startswith(prefix)]
-        return []
+            if prev == "--kind":
+                kinds = ["agent", "instruction", "prompt", "skill"]
+                return [k for k in kinds if k.startswith(prefix)]
+            if prev == "--target":
+                targets = ["claude", "copilot", "opencode"]
+                return [t for t in targets if t.startswith(prefix)]
 
+        # Otherwise offer flags
+        prefix = tokens[position].lower() if position < len(tokens) else ""
+        flags = ["--kind", "--language", "--target", "--topic"]
+        return [f for f in flags if f.startswith(prefix)]

@@ -8,6 +8,7 @@ def test_catalog_commands_registered_under_catalog_category() -> None:
     expected = {
         "catalog_list", "catalog_add", "catalog_install",
         "catalog_remove", "catalog_sync", "catalog_edit",
+        "catalog_help",
     }
     all_cmds = registry.all()
     catalog_cmds = {name for name, _, cat in all_cmds if cat == "catalog"}

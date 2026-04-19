@@ -57,7 +57,10 @@ class CatalogAddCommand:
     def get_completions(position: int, tokens: list[str]) -> list[str]:
         if position == 1:
             prefix = tokens[1].lower() if len(tokens) > 1 else ""
-            kinds = ["instruction", "prompt", "skill", "agent"]
+            return [f for f in ["--kind"] if f.startswith(prefix)]
+        if position == 2:
+            prefix = tokens[2].lower() if len(tokens) > 2 else ""
+            kinds = ["agent", "instruction", "prompt", "skill"]
             return [k for k in kinds if k.startswith(prefix)]
         return []
 

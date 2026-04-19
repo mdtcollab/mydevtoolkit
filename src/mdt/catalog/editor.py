@@ -19,7 +19,11 @@ class CatalogEditor:
         self._catalog_root = catalog_root
 
     def resolve_editor(self) -> str:
-        """Resolve which editor to use. Raises RuntimeError if none found."""
+        """Resolve which editor to use. Checks MDT settings, then $EDITOR, then fallbacks."""
+        from mdt.core import settings
+        configured = settings.get("editor")
+        if configured:
+            return configured
         editor = os.environ.get("EDITOR")
         if editor:
             return editor
@@ -39,5 +43,7 @@ class CatalogEditor:
         """Open the item's canonical source in an editor."""
         editor = self.resolve_editor()
         source_path = self.resolve_source_path(item)
-        subprocess.run([editor, str(source_path)], check=False)
+        # Split editor string to handle args like "code --wait"
+        cmd = editor.split() + [str(source_path)]
+        subprocess.run(cmd, check=False)
 

@@ -44,3 +44,21 @@ class CatalogRemoveCommand:
         manifest.save(project_root)
         return CommandResult(success=True, output=f"Removed '{name}' from project.")
 
+    @staticmethod
+    def get_completions(position: int, tokens: list[str]) -> list[str]:
+        """Complete with installed item names from the manifest."""
+        if position == 0:
+            from mdt.catalog.manifest import CatalogManifest
+            from mdt.core.context import ProjectContext
+            prefix = tokens[0].lower() if tokens else ""
+            try:
+                ctx = ProjectContext.detect()
+                project_root = ctx.repo_root or ctx.cwd
+                manifest = CatalogManifest.load(project_root)
+                return sorted(
+                    r["name"] for r in manifest.list_installed()
+                    if r["name"].startswith(prefix)
+                )
+            except Exception:  # noqa: BLE001
+                return []
+        return []
