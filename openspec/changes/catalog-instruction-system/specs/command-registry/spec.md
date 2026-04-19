@@ -11,11 +11,11 @@ The `CommandRegistry` SHALL allow associating a string command name with a handl
 - **WHEN** `registry.register("openspec_branch", OpenspecBranchCommand, category="openspec")` is called
 - **THEN** `registry.resolve("openspec_branch")` returns `OpenspecBranchCommand`
 
-#### Scenario: Registration of openspec_finish under openspec category
-- **WHEN** `registry.register("openspec_finish", OpenspecFinishCommand, category="openspec")` is called
-- **THEN** `registry.resolve("openspec_finish")` returns `OpenspecFinishCommand`
-
 #### Scenario: Duplicate registration raises an error
 - **WHEN** `registry.register("help", HelpCommand)` is called a second time
 - **THEN** the registry raises `ValueError`
+
+#### Scenario: Catalog commands registered under catalog category
+- **WHEN** the command registry is built
+- **THEN** commands `catalog_list`, `catalog_add`, `catalog_install`, `catalog_remove`, `catalog_sync`, and `catalog_edit` are registered under the "catalog" category
 
