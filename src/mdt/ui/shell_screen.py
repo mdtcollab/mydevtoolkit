@@ -17,7 +17,7 @@ ASCII_HEADER = """\
   ██║ ╚═╝ ██║██████╔╝   ██║   
   ╚═╝     ╚═╝╚═════╝    ╚═╝    MyDevToolkit"""
 
-HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]  [cyan]settings[/cyan]"
+HELP_SUMMARY = "Type [bold]help[/bold] for commands.  Categories: [cyan]openspec[/cyan]  [cyan]git[/cyan]  [cyan]copilot[/cyan]  [cyan]catalog[/cyan]  [cyan]settings[/cyan]"
 
 
 class ShellScreen(Screen[None]):
@@ -100,8 +100,21 @@ class ShellScreen(Screen[None]):
             if result.data.get("theme"):
                 self._apply_theme()
 
+            if result.data.get("run_external"):
+                self._run_external(result.data["run_external"], activity)
+
             if result.exit_requested:
                 self.app.exit()
 
         prompt.value = ""
         prompt.focus()
+
+    def _run_external(self, cmd: list[str], activity) -> None:
+        """Suspend Textual, run an external command, then resume."""
+        import subprocess
+
+        with self.app.suspend():
+            subprocess.run(cmd, check=False)
+        activity.write("[green]Editor closed.[/green]")
+
+
