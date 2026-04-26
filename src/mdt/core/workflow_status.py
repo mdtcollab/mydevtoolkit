@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+from mdt.core.workflow_history import WorkflowHistoryStore, tracked_last_command_source
+
 WorkflowType = Literal["openspec", "speckit", "both", "none"]
 
 
@@ -15,6 +17,7 @@ class WorkflowStatus:
     current_change: str | None = None
     current_iteration: str | None = None
     last_command: str | None = None
+    last_command_source: str = "unknown"
     next_command: str | None = None
 
 
@@ -26,9 +29,9 @@ def detect_workflow_status(project_root: str | Path) -> WorkflowStatus:
     if has_openspec and has_speckit:
         return WorkflowStatus(workflow_type="both")
     if has_openspec:
-        return _infer_openspec_status(root)
+        return _apply_tracked_last_command(root, _infer_openspec_status(root))
     if has_speckit:
-        return _infer_speckit_status(root)
+        return _apply_tracked_last_command(root, _infer_speckit_status(root))
     return WorkflowStatus(workflow_type="none")
 
 
@@ -66,6 +69,7 @@ def _infer_openspec_status(root: Path) -> WorkflowStatus:
         return WorkflowStatus(
             workflow_type="openspec",
             last_command="/opsx:archive",
+            last_command_source="inferred",
             next_command="/opsx:propose",
         )
 
@@ -79,6 +83,7 @@ def _infer_openspec_status(root: Path) -> WorkflowStatus:
             workflow_type="openspec",
             current_change=change_dir.name,
             last_command="/opsx:apply",
+            last_command_source="inferred",
             next_command="/opsx:archive",
         )
 
@@ -87,6 +92,7 @@ def _infer_openspec_status(root: Path) -> WorkflowStatus:
             workflow_type="openspec",
             current_change=change_dir.name,
             last_command="/opsx:apply",
+            last_command_source="inferred",
             next_command="/opsx:apply",
         )
 
@@ -95,6 +101,7 @@ def _infer_openspec_status(root: Path) -> WorkflowStatus:
             workflow_type="openspec",
             current_change=change_dir.name,
             last_command="/opsx:propose",
+            last_command_source="inferred",
             next_command="/opsx:apply",
         )
 
@@ -102,6 +109,7 @@ def _infer_openspec_status(root: Path) -> WorkflowStatus:
         workflow_type="openspec",
         current_change=change_dir.name,
         last_command="/opsx:propose",
+        last_command_source="inferred",
         next_command="/opsx:propose",
     )
 
@@ -123,6 +131,7 @@ def _infer_speckit_status(root: Path) -> WorkflowStatus:
         return WorkflowStatus(
             workflow_type="speckit",
             last_command="/speckit.init",
+            last_command_source="inferred",
             next_command="/speckit.plan",
         )
 
@@ -147,7 +156,28 @@ def _infer_speckit_status(root: Path) -> WorkflowStatus:
         workflow_type="speckit",
         current_iteration=iteration_dir.name,
         last_command=last_command,
+        last_command_source="inferred",
         next_command=next_command,
+    )
+
+
+def _apply_tracked_last_command(root: Path, status: WorkflowStatus) -> WorkflowStatus:
+    history = WorkflowHistoryStore(root)
+    tracked_event = history.latest_successful_event(
+        workflow_type=status.workflow_type,
+        change_name=status.current_change,
+        iteration_name=status.current_iteration,
+    )
+    if tracked_event is None:
+        return status
+
+    return WorkflowStatus(
+        workflow_type=status.workflow_type,
+        current_change=status.current_change,
+        current_iteration=status.current_iteration,
+        last_command=tracked_event.last_command,
+        last_command_source=tracked_last_command_source(tracked_event),
+        next_command=status.next_command,
     )
 
 

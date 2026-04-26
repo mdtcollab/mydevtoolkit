@@ -21,6 +21,7 @@ dev = [
 
 [project.scripts]
 mdt = "mdt.__main__:main"
+mdt-workflow-event = "mdt.workflow_event_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

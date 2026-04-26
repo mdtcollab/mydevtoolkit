@@ -45,6 +45,8 @@ class WorkflowStatusCommand:
             lines.append(f"current iteration: {status.current_iteration}")
         if status.last_command:
             lines.append(f"last command: {status.last_command}")
+        if status.last_command_source != "unknown":
+            lines.append(f"last command source: {status.last_command_source}")
         if status.next_command:
             lines.append(f"next recommended command: {status.next_command}")
 
@@ -63,6 +65,8 @@ def _to_data(status: WorkflowStatus) -> dict[str, str]:
         data["current_iteration"] = status.current_iteration
     if status.last_command:
         data["last_command"] = status.last_command
+    if status.last_command_source != "unknown":
+        data["last_command_source"] = status.last_command_source
     if status.next_command:
         data["next_command"] = status.next_command
     return data

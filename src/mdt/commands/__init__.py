@@ -12,6 +12,7 @@ from mdt.commands.openspec_branch import OpenspecBranchCommand
 from mdt.commands.openspec_finish import OpenspecFinishCommand
 from mdt.commands.settings_editor_set import SettingsEditorSetCommand
 from mdt.commands.settings_theme_set import SettingsThemeSetCommand
+from mdt.commands.workflow_record import WorkflowRecordCommand
 from mdt.commands.workflow_status import WorkflowStatusCommand
 from mdt.core.registry import CommandRegistry
 
@@ -38,6 +39,7 @@ def build_command_registry() -> CommandRegistry:
     registry.register("catalog_sync", CatalogSyncCommand, category="catalog")
     registry.register("catalog_edit", CatalogEditCommand, category="catalog")
     registry.register("catalog_help", CatalogHelpCommand, category="catalog")
+    registry.register("workflow_record", WorkflowRecordCommand, category="workflow")
     registry.register("workflow_status", WorkflowStatusCommand, category="workflow")
     return registry
 

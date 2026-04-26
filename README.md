@@ -43,12 +43,36 @@ Initial commands and categories:
 - `exit`
 - `openspec branch`
 - `git branch <category> <ticket> <description...>`
+- `workflow status`
+- `workflow record workflow_type=<...> command_id=<...> raw_command=<...> success=<true|false> ...`
 
 Top-level categories currently shown in the shell:
 
 - `openspec`
 - `git`
 - `copilot` (reserved for future helpers)
+- `workflow`
+
+## Workflow Event Ingestion
+
+MDT can record workflow events from external AI coding agent hooks so `workflow status` can prefer tracked history over inference for the reported last command.
+
+Project-local workflow events are stored under `.mdt/workflow-history.jsonl`.
+
+For headless integrations, use the dedicated ingestion entrypoint:
+
+```bash
+mdt-workflow-event \
+  --project-root . \
+  --workflow-type openspec \
+  --command-id apply \
+  --raw-command /opsx:apply \
+  --success true \
+  --change-name my-change \
+  --source agent-hook
+```
+
+You can also record events inside the interactive shell with `workflow record` using `key=value` arguments.
 
 ## Project Layout
 
