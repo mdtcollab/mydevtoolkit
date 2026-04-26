@@ -53,7 +53,7 @@ def test_openspec_apply_complete_recommends_archive(tmp_path) -> None:
 
 
 def test_detects_speckit_only_and_infers_plan_to_tasks(tmp_path) -> None:
-    iteration = tmp_path / "speckit" / "iterations" / "iteration-2"
+    iteration = tmp_path / ".specify" / "iterations" / "iteration-2"
     iteration.mkdir(parents=True)
     (iteration / "plan.md").write_text("plan\n", encoding="utf-8")
 
@@ -77,10 +77,37 @@ def test_detects_speckit_iteration_without_artifacts_as_init(tmp_path) -> None:
     assert status.next_command == "/speckit.plan"
 
 
+def test_detects_speckit_iteration_from_specs_folder(tmp_path) -> None:
+    (tmp_path / ".specify").mkdir(parents=True)
+    iteration = tmp_path / "specs" / "iteration-3"
+    iteration.mkdir(parents=True)
+    (iteration / "plan.md").write_text("plan\n", encoding="utf-8")
+
+    status = detect_workflow_status(tmp_path)
+
+    assert status.workflow_type == "speckit"
+    assert status.current_iteration == "iteration-3"
+    assert status.last_command == "/speckit.plan"
+    assert status.next_command == "/speckit.tasks"
+
+
+def test_detects_speckit_implement_when_tasks_have_started(tmp_path) -> None:
+    iteration = tmp_path / ".specify" / "iterations" / "iteration-4"
+    iteration.mkdir(parents=True)
+    (iteration / "tasks.md").write_text("- [x] 1.1 started\n- [ ] 1.2 next\n", encoding="utf-8")
+
+    status = detect_workflow_status(tmp_path)
+
+    assert status.workflow_type == "speckit"
+    assert status.current_iteration == "iteration-4"
+    assert status.last_command == "/speckit-implement"
+    assert status.next_command == "/speckit-implement"
+
+
 def test_detects_both_workflows_explicitly(tmp_path) -> None:
     (tmp_path / "openspec" / "changes").mkdir(parents=True)
     (tmp_path / "openspec" / "config.yaml").write_text("name: demo\n", encoding="utf-8")
-    (tmp_path / "speckit" / "iterations" / "iteration-1").mkdir(parents=True)
+    (tmp_path / ".specify" / "iterations" / "iteration-1").mkdir(parents=True)
 
     status = detect_workflow_status(tmp_path)
 

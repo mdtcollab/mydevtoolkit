@@ -36,7 +36,7 @@ def test_command_outputs_openspec_fields(tmp_path) -> None:
 def test_command_returns_explicit_error_for_both(tmp_path) -> None:
     (tmp_path / "openspec" / "changes").mkdir(parents=True)
     (tmp_path / "openspec" / "config.yaml").write_text("name: demo\n", encoding="utf-8")
-    (tmp_path / "speckit" / "iterations" / "iteration-1").mkdir(parents=True)
+    (tmp_path / ".specify" / "iterations" / "iteration-1").mkdir(parents=True)
 
     command = WorkflowStatusCommand(CommandRegistry())
     result = command(args=[], context=_context(tmp_path))
@@ -72,4 +72,35 @@ def test_workflow_category_is_discoverable_in_completions() -> None:
 
     assert "workflow" in registry.get_completions("w")
     assert "status" in registry.get_completions("workflow ")
+
+
+def test_command_outputs_speckit_fields_from_specify_layout(tmp_path) -> None:
+    iteration = tmp_path / ".specify" / "iterations" / "iteration-2"
+    iteration.mkdir(parents=True)
+    (iteration / "plan.md").write_text("plan\n", encoding="utf-8")
+
+    command = WorkflowStatusCommand(CommandRegistry())
+    result = command(args=[], context=_context(tmp_path))
+
+    assert result.success is True
+    assert "workflow type: speckit" in result.output
+    assert "current iteration: iteration-2" in result.output
+    assert "last command: /speckit.plan" in result.output
+    assert "next recommended command: /speckit.tasks" in result.output
+
+
+def test_command_outputs_speckit_implement_when_tasks_in_progress(tmp_path) -> None:
+    iteration = tmp_path / ".specify" / "iterations" / "iteration-5"
+    iteration.mkdir(parents=True)
+    (iteration / "tasks.md").write_text("- [x] 1.1 started\n- [ ] 1.2 pending\n", encoding="utf-8")
+
+    command = WorkflowStatusCommand(CommandRegistry())
+    result = command(args=[], context=_context(tmp_path))
+
+    assert result.success is True
+    assert "workflow type: speckit" in result.output
+    assert "current iteration: iteration-5" in result.output
+    assert "last command: /speckit-implement" in result.output
+    assert "next recommended command: /speckit-implement" in result.output
+
 

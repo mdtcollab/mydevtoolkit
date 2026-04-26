@@ -50,6 +50,7 @@ def _has_speckit_markers(root: Path) -> bool:
 
 def _speckit_markers(root: Path) -> tuple[Path, ...]:
     return (
+        root / ".specify",
         root / "speckit",
         root / ".speckit",
         root / "speckit.yaml",
@@ -126,9 +127,12 @@ def _infer_speckit_status(root: Path) -> WorkflowStatus:
         )
 
     stage = _infer_speckit_stage(iteration_dir)
-    if stage == "tasks":
+    if stage == "implement":
+        last_command = "/speckit-implement"
+        next_command = "/speckit-implement"
+    elif stage == "tasks":
         last_command = "/speckit.tasks"
-        next_command = "/speckit.implement"
+        next_command = "/speckit-implement"
     elif stage == "plan":
         last_command = "/speckit.plan"
         next_command = "/speckit.tasks"
@@ -148,7 +152,7 @@ def _infer_speckit_status(root: Path) -> WorkflowStatus:
 
 
 def _latest_speckit_iteration(root: Path) -> Path | None:
-    roots = [r for r in (root / "speckit", root / ".speckit") if r.is_dir()]
+    roots = [r for r in (root / ".specify", root / "speckit", root / ".speckit") if r.is_dir()]
     candidates: list[Path] = []
 
     for marker_root in roots:
@@ -157,6 +161,10 @@ def _latest_speckit_iteration(root: Path) -> Path | None:
             candidates.extend(d for d in iterations_dir.iterdir() if d.is_dir())
         candidates.extend(d for d in marker_root.iterdir() if d.is_dir() and d.name.startswith("iteration-"))
 
+    specs_root = root / "specs"
+    if specs_root.is_dir():
+        candidates.extend(d for d in specs_root.iterdir() if d.is_dir())
+
     if not candidates:
         return None
     return max(candidates, key=lambda d: d.stat().st_mtime)
@@ -164,10 +172,16 @@ def _latest_speckit_iteration(root: Path) -> Path | None:
 
 def _infer_speckit_stage(iteration_dir: Path) -> str:
     # Use common artifact names in priority order from later to earlier phases.
+    task_progress = _task_progress(iteration_dir / "tasks.md")
+    if task_progress is not None and task_progress[1] > 0:
+        return "implement"
     if _has_any_file(iteration_dir, "tasks.md", "todo.md"):
         return "tasks"
     if _has_any_file(iteration_dir, "plan.md"):
         return "plan"
+    specs_dir = iteration_dir / "specs"
+    if specs_dir.is_dir() and any(specs_dir.glob("**/*.md")):
+        return "spec"
     if _has_any_file(iteration_dir, "spec.md", "specification.md"):
         return "spec"
     return "init"

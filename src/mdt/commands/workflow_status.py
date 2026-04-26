@@ -23,7 +23,7 @@ class WorkflowStatusCommand:
                 error=(
                     "No supported workflow system found. "
                     "Expected OpenSpec markers under 'openspec/' or Spec Kit markers under "
-                    "'speckit/' or '.speckit/'."
+                    "'.specify/', 'speckit/', or '.speckit/'."
                 ),
                 data={"workflow_type": "none"},
             )
