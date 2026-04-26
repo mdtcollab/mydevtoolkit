@@ -1,2 +1,3 @@
 [console_scripts]
 mdt = mdt.__main__:main
+mdt-workflow-event = mdt.workflow_event_cli:main
