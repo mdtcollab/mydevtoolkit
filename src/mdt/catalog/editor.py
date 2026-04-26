@@ -34,10 +34,15 @@ class CatalogEditor:
             "No editor found. Set $EDITOR or install nano/vi."
         )
 
-    def resolve_source_path(self, item: CatalogItem) -> Path:
+    def resolve_source_path(self, item: CatalogItem | str, primary_file: str | None = None) -> Path:
         """Resolve the canonical source path for the item's primary file."""
-        primary = item.source_files[0] if item.source_files else "README.md"
-        return self._catalog_root / item.name / "source" / primary
+        if isinstance(item, str):
+            item_name = item
+            primary = primary_file or "SKILL.md"
+        else:
+            item_name = item.name
+            primary = primary_file or (item.source_files[0] if item.source_files else "README.md")
+        return self._catalog_root / item_name / "source" / primary
 
     def edit(self, item: CatalogItem) -> None:
         """Open the item's canonical source in an editor."""

@@ -1,6 +1,7 @@
 """Tests for CompletionEngine."""
 from __future__ import annotations
 
+from mdt.commands import build_command_registry
 from mdt.core.completion import CompletionEngine
 from mdt.core.registry import CommandRegistry
 
@@ -93,6 +94,14 @@ class TestCompletionEngineSubCommandLevel:
         result = engine.get_completions("git br")
 
         assert result == ["branch"]
+
+    def test_catalog_category_exposes_managed_skill_subcommands(self) -> None:
+        engine = CompletionEngine(build_command_registry())
+
+        result = engine.get_completions("catalog ")
+
+        assert "import" in result
+        assert "status" in result
 
 
 class TestCompletionEngineArgumentLevel:

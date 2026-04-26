@@ -48,28 +48,42 @@ Usage:
      Then create your content at:
        ~/.config/mdt/catalog/my-skill/source/SKILL.md
 
-  3. List catalog items:
+  3. Import project skills into the central catalog:
+     catalog import
+     catalog import --all
+     catalog import my-skill --as mdt-my-skill --prefix
+
+     Discovers project skills from `.github/skills` and `.claude/skills`.
+     Workflow-related skills are shown but deselected by default.
+
+  4. List catalog items:
      catalog list
      catalog list --kind skill
      catalog list --target claude
      catalog list --language python
 
-  4. Install a catalog item into the current project:
+  5. Install a catalog item into the current project:
      catalog install <name> --target <claude|copilot|opencode>
 
      Example: catalog install my-skill --target claude
      Installs to: .claude/skills/my-skill/SKILL.md
      Tracked in:  .mdt/catalog.json
 
-  5. Sync installed items after editing the canonical source:
+  6. Show managed skill status for the current project:
+     catalog status
+
+     Reports freshness state, install mode, path, logical consumers,
+     and last-edited times for managed skills in the current project.
+
+  7. Sync installed items after editing the canonical source:
      catalog sync
 
-  6. Remove an installed item from the project:
+  8. Remove an installed item from the project:
      catalog remove <name>
 
 Install modes:
   symlink — links to canonical source (auto-synced, same filesystem only)
-  copy    — independent copy (fallback if symlink fails)
+  copy    — independent copy (tracked for later status/sync)
   render  — transforms content for target-specific format\
 """
 

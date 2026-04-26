@@ -1,9 +1,11 @@
 from mdt.commands.catalog_add import CatalogAddCommand
 from mdt.commands.catalog_edit import CatalogEditCommand
 from mdt.commands.catalog_help import CatalogHelpCommand
+from mdt.commands.catalog_import import CatalogImportCommand
 from mdt.commands.catalog_install import CatalogInstallCommand
 from mdt.commands.catalog_list import CatalogListCommand
 from mdt.commands.catalog_remove import CatalogRemoveCommand
+from mdt.commands.catalog_status import CatalogStatusCommand
 from mdt.commands.catalog_sync import CatalogSyncCommand
 from mdt.commands.exit import ExitCommand
 from mdt.commands.git_branch import GitBranchCommand
@@ -34,8 +36,10 @@ def build_command_registry() -> CommandRegistry:
     registry.register("settings_theme_set", SettingsThemeSetCommand, category="settings")
     registry.register("catalog_list", CatalogListCommand, category="catalog")
     registry.register("catalog_add", CatalogAddCommand, category="catalog")
+    registry.register("catalog_import", CatalogImportCommand, category="catalog")
     registry.register("catalog_install", CatalogInstallCommand, category="catalog")
     registry.register("catalog_remove", CatalogRemoveCommand, category="catalog")
+    registry.register("catalog_status", CatalogStatusCommand, category="catalog")
     registry.register("catalog_sync", CatalogSyncCommand, category="catalog")
     registry.register("catalog_edit", CatalogEditCommand, category="catalog")
     registry.register("catalog_help", CatalogHelpCommand, category="catalog")

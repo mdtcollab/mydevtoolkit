@@ -3,10 +3,12 @@ README.md
 pyproject.toml
 src/mdt/__init__.py
 src/mdt/__main__.py
+src/mdt/workflow_event_cli.py
 src/mdt/catalog/__init__.py
 src/mdt/catalog/editor.py
 src/mdt/catalog/installer.py
 src/mdt/catalog/item.py
+src/mdt/catalog/managed_skills.py
 src/mdt/catalog/manifest.py
 src/mdt/catalog/registry.py
 src/mdt/catalog/renderer.py
@@ -14,9 +16,11 @@ src/mdt/commands/__init__.py
 src/mdt/commands/catalog_add.py
 src/mdt/commands/catalog_edit.py
 src/mdt/commands/catalog_help.py
+src/mdt/commands/catalog_import.py
 src/mdt/commands/catalog_install.py
 src/mdt/commands/catalog_list.py
 src/mdt/commands/catalog_remove.py
+src/mdt/commands/catalog_status.py
 src/mdt/commands/catalog_sync.py
 src/mdt/commands/copilot.py
 src/mdt/commands/exit.py
@@ -26,6 +30,7 @@ src/mdt/commands/openspec_branch.py
 src/mdt/commands/openspec_finish.py
 src/mdt/commands/settings_editor_set.py
 src/mdt/commands/settings_theme_set.py
+src/mdt/commands/workflow_record.py
 src/mdt/commands/workflow_status.py
 src/mdt/core/__init__.py
 src/mdt/core/completion.py
@@ -36,6 +41,7 @@ src/mdt/core/registry.py
 src/mdt/core/result.py
 src/mdt/core/settings.py
 src/mdt/core/themes.py
+src/mdt/core/workflow_history.py
 src/mdt/core/workflow_status.py
 src/mdt/ui/__init__.py
 src/mdt/ui/app.py

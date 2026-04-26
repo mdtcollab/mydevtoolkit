@@ -20,14 +20,19 @@ def test_catalog_item_creation_all_fields() -> None:
         description="Propose a change",
         tags={"language": ["python"], "topic": ["openspec"]},
         targets={
-            "claude": TargetConfig(install_mode="symlink", path_template=".claude/skills/{name}/SKILL.md"),
+            "shared_claude": TargetConfig(
+                install_mode="symlink",
+                path_template=".claude/skills/{name}/SKILL.md",
+                consumers=["claude", "copilot"],
+            ),
         },
         source={"files": ["SKILL.md"]},
     )
     assert item.name == "openspec-propose"
     assert item.kind == "skill"
     assert item.source_files == ["SKILL.md"]
-    assert item.targets["claude"].install_mode == "symlink"
+    assert item.targets["shared_claude"].install_mode == "symlink"
+    assert item.targets["shared_claude"].consumers == ["claude", "copilot"]
 
 
 def test_catalog_item_no_language_tags() -> None:
@@ -43,7 +48,11 @@ def test_catalog_item_from_yaml(tmp_path: Path) -> None:
         "tags": {"language": ["python"], "topic": ["testing"]},
         "targets": {
             "claude": {"install_mode": "symlink", "path_template": ".claude/skills/{name}/SKILL.md"},
-            "copilot": {"install_mode": "copy", "path_template": ".github/skills/{name}/SKILL.md"},
+            "shared_claude": {
+                "install_mode": "symlink",
+                "path_template": ".claude/skills/{name}/SKILL.md",
+                "consumers": ["claude", "copilot"],
+            },
         },
         "source": {"files": ["SKILL.md"]},
     }
@@ -54,7 +63,9 @@ def test_catalog_item_from_yaml(tmp_path: Path) -> None:
     assert item.name == "my-skill"
     assert item.kind == "skill"
     assert item.targets["claude"].install_mode == "symlink"
-    assert item.targets["copilot"].resolve_path("my-skill") == ".github/skills/my-skill/SKILL.md"
+    assert item.targets["claude"].consumers == ["claude"]
+    assert item.targets["shared_claude"].resolve_path("my-skill") == ".claude/skills/my-skill/SKILL.md"
+    assert item.targets["shared_claude"].consumers == ["claude", "copilot"]
     assert item.source_files == ["SKILL.md"]
 
 

@@ -5,10 +5,12 @@ from __future__ import annotations
 import hashlib
 import os
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 
 from mdt.catalog.item import CatalogItem
 from mdt.catalog.manifest import CatalogManifest
+from mdt.catalog.managed_skills import resolve_item_target
 from mdt.catalog.renderer import CatalogRenderer
 
 
@@ -23,6 +25,21 @@ def _hash_files(paths: list[Path]) -> str:
     for p in sorted(paths):
         h.update(p.read_bytes())
     return h.hexdigest()
+
+
+def _timestamp_for_path(path: Path) -> str | None:
+    try:
+        if path.is_symlink():
+            stamp = path.lstat().st_mtime
+        elif path.is_file():
+            stamp = path.stat().st_mtime
+        elif path.is_dir():
+            stamp = max((child.stat().st_mtime for child in path.rglob("*") if child.is_file()), default=path.stat().st_mtime)
+        else:
+            return None
+        return datetime.fromtimestamp(stamp, timezone.utc).isoformat()
+    except OSError:
+        return None
 
 
 def _can_symlink(source: Path, target: Path) -> bool:
@@ -57,10 +74,11 @@ class CatalogInstaller:
         Returns the install mode actually used (may differ from config if fallback).
         Raises ValueError if target is not supported by the item.
         """
-        if target not in item.targets:
+        resolved_target = resolve_item_target(item, target)
+        if resolved_target is None:
             raise ValueError(f"Item '{item.name}' does not support target '{target}'")
 
-        target_config = item.targets[target]
+        target_name, target_config = resolved_target
         install_mode = target_config.install_mode
         source_dir = self._catalog_root / item.name / "source"
         source_files = [source_dir / f for f in item.source_files]
@@ -70,6 +88,10 @@ class CatalogInstaller:
             actual_mode = self._install_single(
                 source_files[0], target_path, install_mode, target, item,
             )
+            installed_path = target_config.resolve_path(item.name)
+            installed_paths = [installed_path]
+            installed_hash = _hash_files([target_path]) if target_path.exists() or target_path.is_symlink() else ""
+            project_last_edited_at = _timestamp_for_path(target_path)
         else:
             # Multi-file: resolve path as directory
             base_path = project_root / target_config.resolve_path(item.name)
@@ -77,6 +99,10 @@ class CatalogInstaller:
             actual_mode = self._install_multi(
                 source_dir, item.source_files, target_dir, install_mode, target, item,
             )
+            installed_path = str(target_dir.relative_to(project_root))
+            installed_paths = [str((target_dir / f).relative_to(project_root)) for f in item.source_files]
+            installed_hash = _hash_files([target_dir / f for f in item.source_files]) if installed_paths else ""
+            project_last_edited_at = _timestamp_for_path(target_dir)
 
         # Update manifest if provided
         if manifest is not None:
@@ -85,9 +111,15 @@ class CatalogInstaller:
                 name=item.name,
                 kind=item.kind,
                 target=target,
+                install_target=target_name,
+                logical_consumers=list(target_config.consumers or [target_name]),
                 install_mode=actual_mode,
-                installed_path=target_config.resolve_path(item.name),
+                installed_path=installed_path,
+                installed_paths=installed_paths,
                 source_hash=source_hash,
+                installed_hash=installed_hash,
+                central_last_edited_at=_timestamp_for_path(source_dir),
+                project_last_edited_at=project_last_edited_at,
             )
 
         return actual_mode
