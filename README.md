@@ -19,6 +19,11 @@ pip install -e .[dev]
 mdt
 ```
 
+> **Windows note:** If `mdt` is not recognized after installing, run it via Python directly:
+> ```powershell
+> python -m mdt
+> ```
+
 The shell stays open for repeated commands and now includes:
 
 - an ASCII art header
