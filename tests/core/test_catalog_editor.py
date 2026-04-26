@@ -54,3 +54,10 @@ def test_resolve_source_path(tmp_path: Path) -> None:
     path = editor.resolve_source_path(item)
     assert path == tmp_path / "my-skill" / "source" / "SKILL.md"
 
+
+def test_resolve_source_path_from_managed_name(tmp_path: Path) -> None:
+    editor = CatalogEditor(tmp_path)
+    path = editor.resolve_source_path("my-skill")
+    assert path == tmp_path / "my-skill" / "source" / "SKILL.md"
+
+

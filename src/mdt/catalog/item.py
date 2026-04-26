@@ -15,6 +15,7 @@ class TargetConfig:
 
     install_mode: str  # "symlink", "copy", or "render"
     path_template: str  # e.g. ".claude/skills/{name}/SKILL.md"
+    consumers: list[str] = field(default_factory=list)
 
     def resolve_path(self, name: str) -> str:
         """Resolve the path template with the given item name."""
@@ -51,6 +52,7 @@ class CatalogItem:
             targets[target_name] = TargetConfig(
                 install_mode=target_data["install_mode"],
                 path_template=target_data["path_template"],
+                consumers=list(target_data.get("consumers") or [target_name]),
             )
 
         return cls(

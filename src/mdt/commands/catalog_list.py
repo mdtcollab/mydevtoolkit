@@ -59,7 +59,7 @@ class CatalogListCommand:
                 kinds = ["agent", "instruction", "prompt", "skill"]
                 return [k for k in kinds if k.startswith(prefix)]
             if prev == "--target":
-                targets = ["claude", "copilot", "opencode"]
+                targets = ["claude", "copilot", "opencode", "shared_claude"]
                 return [t for t in targets if t.startswith(prefix)]
 
         # Otherwise offer flags

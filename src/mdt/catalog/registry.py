@@ -6,6 +6,11 @@ import os
 from pathlib import Path
 
 from mdt.catalog.item import CatalogItem
+from mdt.catalog.managed_skills import (
+    build_managed_skill_statuses,
+    discover_project_skills,
+    item_supports_target,
+)
 
 
 DEFAULT_CATALOG_PATH = Path.home() / ".config" / "mdt" / "catalog"
@@ -56,7 +61,7 @@ class CatalogRegistry:
                     tag_key, tag_value = tag
                     if tag_value not in item.tags.get(tag_key, []):
                         continue
-                if target and target not in item.targets:
+                if target and not item_supports_target(item, target):
                     continue
                 items.append(item)
         return items
@@ -70,4 +75,12 @@ class CatalogRegistry:
             return CatalogItem.from_yaml(yaml_path)
         except Exception:  # noqa: BLE001
             return None
+
+    def discover_project_skills(self, project_root: Path) -> list:
+        """Discover skill installations in known project locations."""
+        return discover_project_skills(project_root)
+
+    def get_managed_skill_statuses(self, project_root: Path) -> list:
+        """Return correlated central/project managed-skill status entries."""
+        return build_managed_skill_statuses(project_root, self._root)
 

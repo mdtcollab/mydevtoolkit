@@ -6,8 +6,8 @@ from mdt.commands import build_command_registry
 def test_catalog_commands_registered_under_catalog_category() -> None:
     registry = build_command_registry()
     expected = {
-        "catalog_list", "catalog_add", "catalog_install",
-        "catalog_remove", "catalog_sync", "catalog_edit",
+        "catalog_list", "catalog_add", "catalog_import", "catalog_install",
+        "catalog_remove", "catalog_status", "catalog_sync", "catalog_edit",
         "catalog_help",
     }
     all_cmds = registry.all()

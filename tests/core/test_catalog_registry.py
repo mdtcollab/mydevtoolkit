@@ -87,6 +87,20 @@ def test_filter_by_target(tmp_path: Path) -> None:
     assert claude_items[0].name == "claude-skill"
 
 
+def test_filter_by_logical_consumer(tmp_path: Path) -> None:
+    _create_item(tmp_path, "shared-skill", targets={
+        "shared_claude": {
+            "install_mode": "symlink",
+            "path_template": ".claude/skills/{name}/SKILL.md",
+            "consumers": ["claude", "copilot"],
+        },
+    })
+    registry = CatalogRegistry(catalog_root=tmp_path)
+    copilot_items = registry.list_items(target="copilot")
+    assert len(copilot_items) == 1
+    assert copilot_items[0].name == "shared-skill"
+
+
 def test_custom_path_via_env(tmp_path: Path, monkeypatch) -> None:
     custom = tmp_path / "custom-catalog"
     custom.mkdir()

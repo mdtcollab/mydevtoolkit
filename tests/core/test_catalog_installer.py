@@ -123,8 +123,44 @@ def test_manifest_updated_after_install(tmp_path: Path) -> None:
     assert record is not None
     assert record["kind"] == "skill"
     assert record["target"] == "copilot"
+    assert record["install_target"] == "copilot"
     assert record["install_mode"] == "copy"
+    assert record["logical_consumers"] == ["copilot"]
     assert record["source_hash"] != ""
+    assert record["installed_hash"] != ""
+
+
+def test_install_resolves_shared_target_by_logical_consumer(tmp_path: Path) -> None:
+    catalog_root = tmp_path / "catalog"
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    item = CatalogItem(
+        name="shared-skill",
+        kind="skill",
+        targets={
+            "shared_claude": TargetConfig(
+                install_mode="symlink",
+                path_template=".claude/skills/{name}/SKILL.md",
+                consumers=["claude", "copilot"],
+            ),
+        },
+        source={"files": ["SKILL.md"]},
+    )
+    source_dir = catalog_root / "shared-skill" / "source"
+    source_dir.mkdir(parents=True)
+    (source_dir / "SKILL.md").write_text("Shared content")
+
+    manifest = CatalogManifest()
+    installer = CatalogInstaller(catalog_root)
+    mode = installer.install(item, target="claude", project_root=project_root, manifest=manifest)
+
+    target_path = project_root / ".claude" / "skills" / "shared-skill" / "SKILL.md"
+    record = manifest.get("shared-skill")
+    assert mode == "symlink"
+    assert target_path.is_symlink()
+    assert record is not None
+    assert record["install_target"] == "shared_claude"
+    assert record["logical_consumers"] == ["claude", "copilot"]
 
 
 def test_multi_file_install(tmp_path: Path) -> None:
